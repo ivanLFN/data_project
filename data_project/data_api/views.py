@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
+
 @csrf_exempt
 def upload_file(request):
     if request.method == 'POST' and request.FILES:
