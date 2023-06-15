@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from data_api.models import DataFile
 import pandas as pd
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
 @csrf_exempt
@@ -19,4 +21,14 @@ def get_file_list(request):
     return JsonResponse({'files': files})
 
 
+@api_view(['GET'])
+def get_column(request, file_id):
+    try:
+        data_file = DataFile.objects.get(id=file_id)
+        df = pd.read_csv(data_file.main_file.path)
+        columns = list(df.columns)
+        return Response({'columns': columns})
+    except DataFile.DoesNotExist:
+        return Response({'message': 'Файл не найден'})
+    
 
