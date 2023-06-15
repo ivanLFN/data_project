@@ -32,3 +32,25 @@ def get_column(request, file_id):
         return Response({'message': 'Файл не найден'})
     
 
+@api_view(['GET'])
+def get_data(request, file_id):
+    try:
+        data_file = DataFile.objects.get(id=file_id)
+        df = pd.read_csv(data_file.main_file.path)
+
+        filters = request.GET.getlist('filter')
+
+        if filters:
+            for f in filters:
+                column, value = f.split('=')
+                df = df[df[column] == value]
+        
+        sort_by = request.GET.get('sort_by')
+        if sort_by:
+            df = df.sort_values(by=sort_by)
+
+
+        data = df.to_dict(orient='records')
+        return Response(data)
+    except DataFile.DoesNotExist:
+        return Response({'message': 'Файл не найден.'})
