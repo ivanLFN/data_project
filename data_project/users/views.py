@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer
+from django.contrib.auth import authenticate, login as auth_login
 
+from django.http import HttpRequest
+from rest_framework.decorators import api_view
 
-
-# curl -X POST -H "Content-Type: application/json" -d '{"username":"myuser", "password":"mypassword", "email":"user@example.com"}' http://127.0.0.1:8000/register/
 @api_view(['POST'])
 def register(request):
     serializer = UserSerializer(data=request.data)
@@ -15,4 +15,12 @@ def register(request):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
-
+@api_view(['POST'])
+def user_login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request=request, username=username, password=password)
+    if user is not None:
+        auth_login(request=request, user=user)
+        return Response({'message': 'Аутентификация прошла успешно.'})
+    return Response({'message': 'Неверные учетные данные.'}, status=400)
