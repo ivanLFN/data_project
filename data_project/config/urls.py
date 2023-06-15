@@ -11,5 +11,5 @@ urlpatterns = [
     path('files/<int:file_id>/columns/', get_column, name='get_column'),
     path('files/<int:file_id>/data/', get_data, name='get_data'),
     path('register/', register, name='register'),
-    path('login/', user_login, name='login'),
+    path('login/', user_login, name='user_login'),
 ]
